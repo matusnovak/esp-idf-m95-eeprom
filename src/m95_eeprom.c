@@ -58,13 +58,10 @@ esp_err_t m95_eeprom_enable_write(m95_eeprom_t* handle) {
     }
 
     ret = spi_device_transmit(handle->spi, &txd);
-    if (ret != ESP_OK) {
-        return ret;
-    }
 
     spi_device_release_bus(handle->spi);
 
-    return ESP_OK;
+    return ret;
 }
 
 esp_err_t m95_eeprom_disable_write(m95_eeprom_t* handle) {
@@ -81,13 +78,10 @@ esp_err_t m95_eeprom_disable_write(m95_eeprom_t* handle) {
     }
 
     ret = spi_device_transmit(handle->spi, &txd);
-    if (ret != ESP_OK) {
-        return ret;
-    }
 
     spi_device_release_bus(handle->spi);
 
-    return ESP_OK;
+    return ret;
 }
 
 esp_err_t m95_eeprom_read_status_reg(m95_eeprom_t* handle, uint8_t* status) {
@@ -110,14 +104,14 @@ esp_err_t m95_eeprom_read_status_reg(m95_eeprom_t* handle, uint8_t* status) {
     }
 
     ret = spi_device_transmit(handle->spi, &txd);
-    if (ret != ESP_OK) {
-        return ret;
-    }
 
     spi_device_release_bus(handle->spi);
 
-    *status = txd.rx_data[0];
-    return ESP_OK;
+    if (ret == ESP_OK) {
+        *status = txd.rx_data[0];
+    }
+
+    return ret;
 }
 
 esp_err_t m95_eeprom_wait(m95_eeprom_t* handle) {
@@ -159,13 +153,10 @@ esp_err_t m95_eeprom_write_range(m95_eeprom_t* handle, uint32_t address, const v
     }
 
     ret = spi_device_transmit(handle->spi, (spi_transaction_t*)&txd);
-    if (ret != ESP_OK) {
-        return ret;
-    }
 
     spi_device_release_bus(handle->spi);
 
-    return ESP_OK;
+    return ret;
 }
 
 esp_err_t m95_eeprom_read_range(m95_eeprom_t* handle, uint32_t address, void* data, uint32_t length) {
@@ -189,13 +180,10 @@ esp_err_t m95_eeprom_read_range(m95_eeprom_t* handle, uint32_t address, void* da
     }
 
     ret = spi_device_transmit(handle->spi, (spi_transaction_t*)&txd);
-    if (ret != ESP_OK) {
-        return ret;
-    }
 
     spi_device_release_bus(handle->spi);
 
-    return ESP_OK;
+    return ret;
 }
 
 esp_err_t m95_eeprom_write_byte(m95_eeprom_t* handle, uint32_t address, uint8_t data) {
@@ -219,13 +207,10 @@ esp_err_t m95_eeprom_write_byte(m95_eeprom_t* handle, uint32_t address, uint8_t 
     }
 
     ret = spi_device_transmit(handle->spi, (spi_transaction_t*)&txd);
-    if (ret != ESP_OK) {
-        return ret;
-    }
 
     spi_device_release_bus(handle->spi);
 
-    return ESP_OK;
+    return ret;
 }
 
 esp_err_t m95_eeprom_read_byte(m95_eeprom_t* handle, uint32_t address, uint8_t* data) {
@@ -249,11 +234,8 @@ esp_err_t m95_eeprom_read_byte(m95_eeprom_t* handle, uint32_t address, uint8_t* 
     }
 
     ret = spi_device_transmit(handle->spi, (spi_transaction_t*)&txd);
-    if (ret != ESP_OK) {
-        return ret;
-    }
 
     spi_device_release_bus(handle->spi);
 
-    return ESP_OK;
+    return ret;
 }
