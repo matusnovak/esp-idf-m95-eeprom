@@ -1,6 +1,12 @@
 {
     "name": "m95-eeprom",
-    "keywords": "esp32, eeprom, m95",
+    "version": "1.0.0",
+    "keywords": "esp32, eeprom, m95, esp-idf, spi",
+    "repository":
+    {
+        "type": "git",
+        "url": "https://github.com/matusnovak/esp-idf-m95-eeprom.git"
+    },
     "authors": [
         {
             "name": "Matus Novak",
