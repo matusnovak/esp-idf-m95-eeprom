@@ -1,0 +1,14 @@
+{
+    "name": "m95-eeprom",
+    "keywords": "esp32, eeprom, m95",
+    "authors": [
+        {
+            "name": "Matus Novak",
+            "email": "email@matusnovak.com",
+            "url": "https://matusnovak.com"
+        }
+    ],
+    "license": "UNLICENSE",
+    "platform": "espressif32",
+    "framework": "espidf"
+}
