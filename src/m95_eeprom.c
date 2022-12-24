@@ -13,7 +13,7 @@ struct m95_eeprom_context_t {
     uint8_t address_size;
 };
 
-typedef m95_eeprom_context_t m95_eeprom_context_t;
+typedef struct m95_eeprom_context_t m95_eeprom_context_t;
 
 esp_err_t m95_eeprom_init(const m95_eeprom_config_t* config, m95_eeprom_handle_t* handle) {
     if (!config || !handle) {
