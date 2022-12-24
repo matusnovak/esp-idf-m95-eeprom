@@ -8,30 +8,45 @@
 #define M95_CMD_WRITE_ARRAY 0x02
 #define M95_CMD_READ_ARRAY 0x03
 
-esp_err_t m95_eeprom_init(m95_eeprom_t* handle, spi_host_device_t host, int cs_pin, uint8_t address_size) {
-    if (!handle) {
+struct m95_eeprom_context_t {
+    spi_device_handle_t spi;
+    uint8_t address_size;
+};
+
+typedef m95_eeprom_context_t m95_eeprom_context_t;
+
+esp_err_t m95_eeprom_init(const m95_eeprom_config_t* config, m95_eeprom_handle_t* handle) {
+    if (!config || !handle) {
         return ESP_ERR_INVALID_ARG;
+    }
+
+    m95_eeprom_context_t* ctx = (m95_eeprom_context_t*)malloc(sizeof(m95_eeprom_context_t));
+    if (!ctx) {
+        return ESP_ERR_NO_MEM;
     }
 
     spi_device_interface_config_t devcfg = {};
     devcfg.mode = 0;
     devcfg.clock_speed_hz = 5 * 1000 * 1000;
-    devcfg.spics_io_num = cs_pin;
+    devcfg.spics_io_num = config->cs_pin;
     devcfg.queue_size = 3;
     devcfg.command_bits = 8;
     devcfg.address_bits = 0;
 
-    handle->address_size = address_size;
+    ctx->address_size = config->address_size;
 
-    esp_err_t ret = spi_bus_add_device(host, &devcfg, &handle->spi);
+    esp_err_t ret = spi_bus_add_device(config->host, &devcfg, &ctx->spi);
     if (ret != ESP_OK) {
+        free(ctx);
         return ret;
     }
+
+    *handle = ctx;
 
     return ESP_OK;
 }
 
-esp_err_t m95_eeprom_remove(m95_eeprom_t* handle) {
+esp_err_t m95_eeprom_deinit(m95_eeprom_handle_t handle) {
     if (!handle) {
         return ESP_ERR_INVALID_ARG;
     }
@@ -44,7 +59,7 @@ esp_err_t m95_eeprom_remove(m95_eeprom_t* handle) {
     return ESP_OK;
 }
 
-esp_err_t m95_eeprom_enable_write(m95_eeprom_t* handle) {
+esp_err_t m95_eeprom_enable_write(m95_eeprom_handle_t handle) {
     if (!handle || !handle->spi) {
         return ESP_ERR_INVALID_STATE;
     }
@@ -64,7 +79,7 @@ esp_err_t m95_eeprom_enable_write(m95_eeprom_t* handle) {
     return ret;
 }
 
-esp_err_t m95_eeprom_disable_write(m95_eeprom_t* handle) {
+esp_err_t m95_eeprom_disable_write(m95_eeprom_handle_t handle) {
     if (!handle || !handle->spi) {
         return ESP_ERR_INVALID_STATE;
     }
@@ -84,7 +99,7 @@ esp_err_t m95_eeprom_disable_write(m95_eeprom_t* handle) {
     return ret;
 }
 
-esp_err_t m95_eeprom_read_status_reg(m95_eeprom_t* handle, uint8_t* status) {
+esp_err_t m95_eeprom_read_status_reg(m95_eeprom_handle_t handle, uint8_t* status) {
     if (!handle || !handle->spi) {
         return ESP_ERR_INVALID_STATE;
     }
@@ -114,7 +129,7 @@ esp_err_t m95_eeprom_read_status_reg(m95_eeprom_t* handle, uint8_t* status) {
     return ret;
 }
 
-esp_err_t m95_eeprom_wait(m95_eeprom_t* handle) {
+esp_err_t m95_eeprom_wait(m95_eeprom_handle_t handle) {
     while (true) {
         uint8_t status;
         esp_err_t ret = m95_eeprom_read_status_reg(handle, &status);
@@ -132,7 +147,7 @@ esp_err_t m95_eeprom_wait(m95_eeprom_t* handle) {
     return ESP_OK;
 }
 
-esp_err_t m95_eeprom_write_range(m95_eeprom_t* handle, uint32_t address, const void* data, uint32_t length) {
+esp_err_t m95_eeprom_write_range(m95_eeprom_handle_t handle, uint32_t address, const void* data, uint32_t length) {
     if (!handle || !handle->spi) {
         return ESP_ERR_INVALID_STATE;
     }
@@ -159,7 +174,7 @@ esp_err_t m95_eeprom_write_range(m95_eeprom_t* handle, uint32_t address, const v
     return ret;
 }
 
-esp_err_t m95_eeprom_read_range(m95_eeprom_t* handle, uint32_t address, void* data, uint32_t length) {
+esp_err_t m95_eeprom_read_range(m95_eeprom_handle_t handle, uint32_t address, void* data, uint32_t length) {
     if (!handle || !handle->spi) {
         return ESP_ERR_INVALID_STATE;
     }
@@ -186,7 +201,7 @@ esp_err_t m95_eeprom_read_range(m95_eeprom_t* handle, uint32_t address, void* da
     return ret;
 }
 
-esp_err_t m95_eeprom_write_byte(m95_eeprom_t* handle, uint32_t address, uint8_t data) {
+esp_err_t m95_eeprom_write_byte(m95_eeprom_handle_t handle, uint32_t address, uint8_t data) {
     if (!handle || !handle->spi) {
         return ESP_ERR_INVALID_STATE;
     }
@@ -213,7 +228,7 @@ esp_err_t m95_eeprom_write_byte(m95_eeprom_t* handle, uint32_t address, uint8_t 
     return ret;
 }
 
-esp_err_t m95_eeprom_read_byte(m95_eeprom_t* handle, uint32_t address, uint8_t* data) {
+esp_err_t m95_eeprom_read_byte(m95_eeprom_handle_t handle, uint32_t address, uint8_t* data) {
     if (!handle || !handle->spi) {
         return ESP_ERR_INVALID_STATE;
     }

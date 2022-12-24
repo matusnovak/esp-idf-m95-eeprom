@@ -27,7 +27,7 @@ A [PlatformIO](https://platformio.org/) `library.json` is provided. You can add 
 * Identification pages
 * Locking
 
-## Usage C
+## Usage
 
 ```c
 #include <m95_eeprom.h>
@@ -56,20 +56,27 @@ void app_main() {
     // Init EEPROM device & initializes SPI device
     // Uses 24 bit addressing (check your datasheet!)
     // Tested on m95m04
-    m95_eeprom_t eeprom;
-    ret = m95_eeprom_init(&eeprom, SPI3_HOST, EEPROM_CS_PIN, 24);
+    m95_eeprom_config_t config = {};
+    config.host = SPI3_HOST;
+    config.cs_pin = EEPROM_CS_PIN;
+    config.address_size = 24;
+
+    // Do the init with the config
+    m95_eeprom_handle_t eeprom;
+    ret = m95_eeprom_init(config, &eeprom);
     ESP_ERROR_CHECK(ret);
 
-    // Enable write, must be done before each write command!
-    ret = m95_eeprom_enable_write(&eeprom);
+    // Enable write.
+    // !!! MUST BE DONE BEFORE EACH WRITE COMMAND !!!
+    ret = m95_eeprom_enable_write(eeprom);
     ESP_ERROR_CHECK(ret);
 
     // Write length of 12 bytes at an address 0x05
-    ret = m95_eeprom_write_range(&eeprom, 0x05, "Hello World!", 12);
+    ret = m95_eeprom_write_range(eeprom, 0x05, "Hello World!", 12);
     ESP_ERROR_CHECK(ret);
 
     // Wait for the read to finish
-    ret = m95_eeprom_enable_wait(&eeprom);
+    ret = m95_eeprom_enable_wait(eeprom);
     ESP_ERROR_CHECK(ret);
 
     // Read destination
@@ -78,70 +85,15 @@ void app_main() {
     memset(buffer, 'x', 12); // Optional, for debugging purposes
 
     // Read length of 12 bytes from an address 0x05
-    ret = m95_eeprom_read_range(&eeprom, 0x05, buffer, 12);
+    ret = m95_eeprom_read_range(eeprom, 0x05, buffer, 12);
     ESP_ERROR_CHECK(ret);
 
     printf("EEPROM read at address 0x05 result: %s\n", buffer);
 
     // Deinitialize & remove SPI device from the SPI host bus
-    ret = eeprom.remove();
+    // Additinally frees the memory allocated by the init function.
+    ret = m95_eeprom_deinit(eeprom);
     ESP_ERROR_CHECK(ret);
 }
 
-```
-
-## Usage C++
-
-```cpp
-#include <m95_eeprom.hpp> // auto includes m95_eeprom.h
-
-// A c++ wrapper around m95_eeprom_xtz functions
-M95EEPROM eeprom;
-
-void app_main() {
-    spi_bus_config_t bus = {};
-    bus.data0_io_num = -1;
-    bus.data1_io_num = -1;
-    bus.data2_io_num = -1;
-    bus.data3_io_num = -1;
-    bus.data4_io_num = -1;
-    bus.data5_io_num = -1;
-    bus.data6_io_num = -1;
-    bus.data7_io_num = -1;
-    bus.miso_io_num = SPI3_PIN_MISO;
-    bus.mosi_io_num = SPI3_PIN_MOSI;
-    bus.sclk_io_num = SPI3_PIN_CLK;
-    bus.quadhd_io_num = -1;
-    bus.quadwp_io_num = -1;
-    bus.max_transfer_sz = 4;
-
-    // Initialize SPI host bus
-    esp_err_t ret = spi_bus_initialize(SPI3_HOST, &bus, SPI_DMA_CH_AUTO);
-    ESP_ERROR_CHECK(ret);
-
-    // Init EEPROM device & initializes SPI device
-    // Uses 24 bit addressing (check your datasheet!)
-    // Tested on m95m04
-    ret = eeprom.init(SPI3_HOST, EEPROM_CS_PIN, 24);
-    ESP_ERROR_CHECK(ret);
-
-    // Write length of 12 bytes at an address 0x05
-    ret = eeprom.writeRange(0x05, "Hello World!", 12);
-    ESP_ERROR_CHECK(ret);
-
-    // Read destination
-    char buffer[13];
-    buffer[12] = '\0'; // Null terminate string
-    memset(buffer, 'x', 12); // Optional, for debugging purposes
-
-    // Read length of 12 bytes from an address 0x05
-    ret = eeprom.readRange(0x05, buffer, 12);
-    ESP_ERROR_CHECK(ret);
-
-    printf("EEPROM read at address 0x05 result: %s\n", buffer);
-
-    // Deinitialize & remove SPI device from the SPI host bus
-    ret = eeprom.remove();
-    ESP_ERROR_CHECK(ret);
-}
 ```
