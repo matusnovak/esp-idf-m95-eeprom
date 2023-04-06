@@ -1,5 +1,7 @@
 # ESP-IDF m95 EEPROM Library
 
+[![PlatformIO Registry](https://badges.registry.platformio.org/packages/matusnovak/library/m95-eeprom.svg)](https://registry.platformio.org/libraries/matusnovak/m95-eeprom)
+
 This is a simple EEPROM library for the m950x0 and m95mx0 series SPI EEPROM chips. For example: [m95m01](https://www.st.com/resource/en/datasheet/m95m01-r.pdf) chip.
 This library targets the [ESP-IDF](https://docs.espressif.com/projects/esp-idf/en/latest/esp32s3/get-started/index.html)
 framework.
