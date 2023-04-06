@@ -8,7 +8,7 @@ This is a C and C++ library available via `m95_eeprom.h` and `m95_eeprom.hpp` re
 
 This code was tested on the `m95m04` chip with the `ESP32-S3-WROOM-1` microcontroller using `SPI2` and `SPI3` buses. Implemented based on the documentation provided in the [m95m04-dr-5 datasheet](https://www.st.com/resource/en/datasheet/m95m04-dr.pdf).
 
-A [PlatformIO](https://platformio.org/) `library.json` is provided. You can add this library as git clone (or as a git submodule) into your own project's `lib` folder.
+A [PlatformIO](https://platformio.org/) `library.json` is provided. You can add this library as git clone (or as a git submodule) into your own project's `lib` folder. **[PlatformIO registry link](https://registry.platformio.org/libraries/matusnovak/m95-eeprom)**.
 
 ## Available commands
 

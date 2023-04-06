@@ -14,7 +14,7 @@
             "url": "https://matusnovak.com"
         }
     ],
-    "license": "UNLICENSE",
+    "license": "Unlicense",
     "platform": "espressif32",
     "framework": "espidf"
 }
